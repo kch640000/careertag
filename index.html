@@ -1,0 +1,785 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Our Town Career Tag</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,800&family=Jua&family=Noto+Sans+KR:wght@400;500;700&display=swap">
+<style>
+:root {
+  --bg: #eaf2f0; --surface: #ffffff; --ink: #14302f; --muted: #587371; --line: #cddcd9;
+  --accent: #0f7a6c; --accent-ink: #ffffff; --badge: #f2c230; --badge-ink: #2a2208;
+  --miss-bg: #fde6c4; --miss-fg: #8a4b00; --stamp: #c0392b;
+  --font-display: "Jua", "Noto Sans KR", system-ui, sans-serif;
+  --font-body: "Noto Sans KR", system-ui, -apple-system, "Apple SD Gothic Neo", sans-serif;
+  --font-en: "Bricolage Grotesque", "Noto Sans KR", system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f1c1b; --surface: #162826; --ink: #e3efec; --muted: #93aba7; --line: #2a403d;
+    --accent: #43c2ae; --accent-ink: #062320; --badge: #e0b228; --badge-ink: #231c05;
+    --miss-bg: #4a3414; --miss-fg: #ffcf8a; --stamp: #e06b5c; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0f1c1b; --surface: #162826; --ink: #e3efec; --muted: #93aba7; --line: #2a403d;
+  --accent: #43c2ae; --accent-ink: #062320; --badge: #e0b228; --badge-ink: #231c05;
+  --miss-bg: #4a3414; --miss-fg: #ffcf8a; --stamp: #e06b5c; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0; background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 15px; line-height: 1.6;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 24px 48px;
+}
+.wrap { max-width: 1160px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }
+header .eyebrow { font-family: var(--font-en); font-weight: 800; letter-spacing: .12em; font-size: 12px; color: var(--accent); text-transform: uppercase; }
+header h1 { font-family: var(--font-display); font-weight: 400; font-size: clamp(28px, 5vw, 42px); line-height: 1.15; margin: 4px 0 6px; text-wrap: balance; }
+header p { margin: 0; color: var(--muted); max-width: 64ch; }
+.notice { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; background: var(--surface); border: 1px dashed var(--line); border-radius: 10px; padding: 10px 14px; font-size: 14px; }
+.notice strong { color: var(--accent); }
+
+.grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 450px); gap: 24px; align-items: start; }
+@media (max-width: 900px) { .grid { grid-template-columns: minmax(0, 1fr); } }
+
+form { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+fieldset { margin: 0; border: 1px solid var(--line); border-radius: 14px; background: var(--surface); padding: 16px 18px 18px; display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+fieldset.done { border-color: var(--accent); }
+legend { font-family: var(--font-display); font-size: 20px; padding: 0 6px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+legend .num { font-family: var(--font-en); font-weight: 800; font-size: 13px; background: var(--line); color: var(--ink); width: 24px; height: 24px; border-radius: 50%; display: inline-grid; place-items: center; }
+fieldset.done legend .num { background: var(--accent); color: var(--accent-ink); }
+legend .how { font-family: var(--font-body); font-size: 12px; font-weight: 700; color: var(--muted); border: 1px solid var(--line); border-radius: 999px; padding: 0 8px; }
+.row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+@media (max-width: 560px) { .row { grid-template-columns: 1fr; } }
+.field { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+label, .label { font-weight: 700; font-size: 14px; }
+.label-en { font-family: var(--font-en); font-weight: 500; color: var(--muted); font-size: 13px; }
+.opt { font-weight: 400; color: var(--muted); font-size: 12.5px; }
+input[type="text"], select, textarea { font: inherit; color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 9px 11px; width: 100%; }
+textarea { resize: vertical; line-height: 1.5; }
+input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.note { margin: 0; font-size: 13px; color: var(--muted); background: var(--bg); border-radius: 8px; padding: 7px 11px; }
+.frame { font-family: var(--font-en); font-size: 13px; color: var(--muted); }
+
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chips input { position: absolute; opacity: 0; pointer-events: none; }
+.chips label { font-weight: 500; border: 1px solid var(--line); border-radius: 999px; padding: 5px 14px; cursor: pointer; background: var(--bg); display: flex; flex-direction: column; line-height: 1.3; font-size: 14px; }
+.chips label .en { font-family: var(--font-en); }
+.chips label small { font-weight: 400; font-size: 12px; color: var(--muted); }
+.chips.big label { border-radius: 10px; padding: 7px 12px; }
+.chips.emoji label { border-radius: 12px; align-items: center; text-align: center; padding: 8px 10px; min-width: 92px; }
+.chips.emoji label b { font-size: 24px; line-height: 1.2; font-weight: 400; }
+.chips input:checked + label { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.chips input:checked + label small { color: var(--accent-ink); opacity: .85; }
+.chips input:focus-visible + label { outline: 2px solid var(--accent); outline-offset: 2px; }
+.multi-tip { font-size: 12px; color: var(--muted); font-weight: 400; }
+.own { display: flex; flex-direction: column; gap: 4px; }
+.tr { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; font-size: 13px; color: var(--miss-fg); }
+.tr:empty { display: none; }
+.tr a { color: var(--accent); font-weight: 700; }
+
+/* Before / now scales */
+.lk { display: flex; flex-direction: column; gap: 6px; padding-block: 10px; border-bottom: 1px dashed var(--line); }
+.lk:last-child { border-bottom: 0; }
+.lk p { margin: 0; font-size: 14px; }
+.lk-row { display: flex; align-items: center; gap: 10px; }
+.lk-row > span { width: 30px; flex: none; font-size: 12px; font-weight: 700; color: var(--muted); }
+.scale { display: flex; gap: 6px; flex-wrap: wrap; }
+.scale input { position: absolute; opacity: 0; pointer-events: none; }
+.scale label { width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; border: 1px solid var(--line); background: var(--bg); cursor: pointer; font-family: var(--font-en); font-weight: 800; font-size: 14px; }
+.scale input:checked + label { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.scale input:focus-visible + label { outline: 2px solid var(--accent); outline-offset: 2px; }
+.scale.star label { font-size: 18px; font-family: var(--font-body); color: var(--muted); }
+.scale.star input:checked + label { background: var(--badge); border-color: var(--badge); color: var(--badge-ink); }
+.duo { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+@media (max-width: 560px) { .duo { grid-template-columns: 1fr; } }
+.duo > div { background: var(--bg); border-radius: 10px; padding: 10px 12px; display: flex; flex-direction: column; gap: 8px; }
+.duo h4 { margin: 0; font-size: 14px; }
+.duo .chips label { background: var(--surface); }
+
+/* Preview */
+.preview { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 12px); display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+@media (max-width: 900px) { .preview { position: static; } }
+.progress { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--muted); }
+.bar { flex: 1; height: 8px; background: var(--line); border-radius: 999px; overflow: hidden; }
+.bar i { display: block; height: 100%; background: var(--accent); width: 0; transition: width .3s; }
+.tabs { display: flex; gap: 4px; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 4px; }
+.tabs button { flex: 1; font: inherit; font-weight: 700; font-size: 14px; border: 0; background: transparent; color: var(--muted); padding: 8px 6px; border-radius: 7px; cursor: pointer; }
+.tabs button[aria-selected="true"] { background: var(--accent); color: var(--accent-ink); }
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 20px; min-width: 0; }
+.panel h3 { font-family: var(--font-display); font-weight: 400; font-size: 18px; margin: 14px 0 6px; }
+.panel h3:first-child { margin-top: 0; }
+.panel .en { font-family: var(--font-en); font-size: 16px; line-height: 1.7; overflow-wrap: anywhere; }
+.panel .en p { margin: 0 0 12px; }
+.panel .en h2 { font-size: 21px; font-weight: 800; margin: 0 0 12px; line-height: 1.25; }
+.panel p { margin: 0 0 8px; font-size: 14px; }
+mark.miss { background: var(--miss-bg); color: var(--miss-fg); border-radius: 4px; padding: 0 4px; font-family: var(--font-body); font-size: .85em; }
+.ko { font-family: var(--font-body); font-size: .8em; color: var(--muted); }
+.actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 8px; }
+.btn { font: inherit; font-weight: 700; font-size: 14px; border-radius: 8px; padding: 8px 14px; cursor: pointer; border: 1px solid var(--accent); background: var(--accent); color: var(--accent-ink); }
+.btn.ghost { background: transparent; color: var(--accent); }
+.btn.big { font-size: 16px; padding: 11px 22px; }
+.btn:disabled { opacity: .5; cursor: not-allowed; }
+.status { font-size: 13px; color: var(--muted); }
+.srow { display: grid; grid-template-columns: 34px minmax(0, 1fr) 56px; gap: 10px; align-items: center; font-size: 13.5px; font-variant-numeric: tabular-nums; margin-bottom: 6px; }
+.srow > span:first-child { font-weight: 700; color: var(--muted); }
+.meter { height: 10px; background: var(--line); border-radius: 999px; overflow: hidden; }
+.meter i { display: block; height: 100%; background: var(--muted); }
+.meter.now i { background: var(--accent); }
+.delta { font-weight: 700; color: var(--accent); }
+
+/* Name tag */
+.tag-stage { display: grid; place-items: center; padding: 8px 0 4px; }
+.tag { width: min(100%, 340px); background: var(--badge); color: var(--badge-ink); border-radius: 18px; padding: 34px 22px 22px; position: relative; box-shadow: 0 10px 24px rgba(0,0,0,.12); font-family: var(--font-en); overflow: hidden; }
+.tag::before { content: ""; position: absolute; top: 12px; left: 50%; width: 54px; height: 10px; margin-left: -27px; border-radius: 999px; background: var(--bg); }
+.tag-top { font-weight: 800; font-size: 11px; letter-spacing: .14em; text-align: center; opacity: .75; }
+.tag-mono { width: 60px; height: 60px; border-radius: 50%; margin: 12px auto 8px; display: grid; place-items: center; background: var(--badge-ink); color: var(--badge); font-weight: 800; font-size: 26px; }
+.tag-name { text-align: center; font-weight: 800; font-size: 25px; line-height: 1.15; overflow-wrap: anywhere; }
+.tag-job { text-align: center; font-weight: 800; font-size: 18px; margin-top: 4px; }
+.tag-ko { text-align: center; font-family: var(--font-display); font-size: 15px; opacity: .8; }
+.tag-place { text-align: center; font-size: 13px; margin-top: 6px; border-top: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor; padding: 4px 0; opacity: .9; }
+.tag-stamp { position: absolute; top: 58px; right: -6px; transform: rotate(14deg); border: 2.5px solid var(--stamp); color: var(--stamp); font-weight: 800; font-size: 11px; letter-spacing: .08em; line-height: 1.15; text-align: center; padding: 4px 8px; border-radius: 6px; background: rgba(255,255,255,.35); }
+.journey { margin-top: 12px; display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 30px; line-height: 1; }
+.journey small { display: block; font-family: var(--font-body); font-size: 10.5px; font-weight: 700; opacity: .7; margin-top: 4px; text-align: center; }
+.journey .arrow { font-size: 18px; opacity: .6; }
+.tag .gauge { margin-top: 10px; font-size: 12px; font-weight: 700; }
+.tag .gauge .g { display: grid; grid-template-columns: 40px 1fr 30px; gap: 8px; align-items: center; margin-top: 4px; font-variant-numeric: tabular-nums; }
+.tag .gauge .t { height: 8px; border-radius: 999px; background: rgba(0,0,0,.12); overflow: hidden; }
+.tag .gauge .t i { display: block; height: 100%; background: var(--badge-ink); opacity: .45; }
+.tag .gauge .g.now .t i { opacity: 1; }
+.tag dl { margin: 12px 0 0; display: flex; flex-direction: column; gap: 8px; font-size: 13.5px; line-height: 1.45; }
+.tag dt { font-weight: 800; font-size: 10.5px; letter-spacing: .12em; text-transform: uppercase; opacity: .7; }
+.tag dd { margin: 0; overflow-wrap: anywhere; }
+.tag mark.miss { background: rgba(255,255,255,.55); color: var(--badge-ink); }
+.badges { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-top: 14px; }
+.bdg { aspect-ratio: 1; border-radius: 50%; border: 1.5px dashed currentColor; display: grid; place-items: center; text-align: center; font-size: 8.5px; font-weight: 800; letter-spacing: .03em; line-height: 1.1; opacity: .35; padding: 4px; }
+.bdg b { display: block; font-size: 18px; font-weight: 400; }
+.bdg.on { opacity: 1; border-style: solid; background: var(--badge-ink); color: var(--badge); }
+.tip { font-size: 13px; color: var(--muted); text-align: center; margin: 8px 0 0; }
+@media (prefers-reduced-motion: reduce) { .bar i { transition: none; } }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Be the Angus of Our Town · Final</div>
+    <h1>인터뷰 끝! 나의 Career Tag 완성하기</h1>
+    <p>인터뷰까지 모두 마친 여러분, 수고 많았어요. 고르고 짧게 쓰기만 하면 <b>직업 태그</b>에 배지가 하나씩 붙고 <b>영어 성장 리포트</b>가 완성돼요. 배지 4개를 모두 모은 뒤 맨 아래에서 <b>선생님께 제출</b>하세요.</p>
+  </header>
+
+  <div class="notice">
+    <span id="noticeText">쓴 내용은 이 기기에 자동 저장돼요. 정답은 없으니 솔직하게 써 주세요.</span>
+    <button class="btn ghost" type="button" id="resetBtn">처음부터 다시</button>
+  </div>
+
+  <div class="grid">
+    <form id="f" autocomplete="off">
+      <fieldset id="s1">
+        <legend><span class="num">1</span>나는 2036년의 직업인 <span class="how">고르기</span></legend>
+        <div class="row">
+          <div class="field"><label for="classNo">반</label><select id="classNo"></select></div>
+          <div class="field"><label for="num">번호</label><select id="num"></select></div>
+        </div>
+        <div class="row">
+          <div class="field">
+            <label for="name">이름 <span class="label-en">영어로</span></label>
+            <input type="text" id="name" placeholder="Minji Kim">
+          </div>
+          <div class="field"><label for="jobSel">나의 직업</label><select id="jobSel"></select></div>
+        </div>
+        <div class="row" id="customRow" hidden>
+          <div class="field"><label for="jobEn">직업 영어 이름</label><input type="text" id="jobEn" placeholder="baker"></div>
+          <div class="field"><label for="place">일하는 곳</label><input type="text" id="place" placeholder="Our Town Bakery"></div>
+        </div>
+        <div class="field">
+          <label for="vol">마을을 위한 나의 약속 <span class="opt">(직업을 고르면 자동으로 채워져요. 내 계획서대로 고쳐도 좋아요)</span></label>
+          <div class="frame">I will ______.</div>
+          <input type="text" id="vol">
+          <div class="tr" id="volTr"></div>
+        </div>
+      </fieldset>
+
+      <fieldset id="s2">
+        <legend><span class="num">2</span>인터뷰를 마치고 <span class="how">고르고 한 문장</span></legend>
+        <div class="row">
+          <div class="field"><label for="q1">1차에서 받은 질문</label><select id="q1"></select></div>
+          <div class="field"><label for="q2">2차에서 받은 질문</label><select id="q2"></select></div>
+        </div>
+        <div class="field">
+          <span class="label">인터뷰에서 나는</span>
+          <div class="chips big" id="iDoneChips"></div>
+        </div>
+        <div class="field">
+          <span class="label">인터뷰할 때 내 기분</span>
+          <div class="chips" id="iFeelChips"></div>
+        </div>
+        <div class="field">
+          <span class="label">가장 어려웠던 점 <span class="multi-tip">여러 개 골라도 돼요</span></span>
+          <div class="chips" id="iHardChips"></div>
+        </div>
+        <div class="field">
+          <label for="bestLine">인터뷰에서 내가 말한 가장 자랑스러운 영어 문장 <span class="opt">(기억나는 대로)</span></label>
+          <input type="text" id="bestLine" placeholder="Helping sick animals makes me excited.">
+          <div class="tr" id="bestLineTr"></div>
+        </div>
+      </fieldset>
+
+      <fieldset id="s3">
+        <legend><span class="num">3</span>용기 측정기: 처음의 나 vs 지금의 나 <span class="how">고르고 쓰기</span></legend>
+        <div class="duo">
+          <div>
+            <h4>프로젝트를 시작할 때, 영어로 말하는 나는</h4>
+            <div class="chips emoji" id="metaBChips"></div>
+          </div>
+          <div>
+            <h4>인터뷰를 마친 지금, 영어로 말하는 나는</h4>
+            <div class="chips emoji" id="metaNChips"></div>
+          </div>
+        </div>
+        <div class="field">
+          <label for="metaWhy">왜 그렇게 바뀌었나요? (또는 왜 그대로인가요?) <span class="opt">한글로 2문장 이상</span></label>
+          <textarea id="metaWhy" rows="3" placeholder="예: 처음엔 틀릴까 봐 입을 못 열었는데, 같은 질문을 여러 번 말해 보니까 인터뷰 때는 생각보다 덜 떨렸다."></textarea>
+        </div>
+        <div class="field">
+          <span class="label">처음과 지금, 각각 골라 주세요</span>
+          <p class="note">1 전혀 아니다 &nbsp; 2 아니다 &nbsp; 3 보통이다 &nbsp; 4 그렇다 &nbsp; 5 매우 그렇다</p>
+          <div id="likertBox"></div>
+        </div>
+        <div class="field">
+          <span class="label">자신감이 생긴 결정적 순간 <span class="multi-tip">여러 개 골라도 돼요</span></span>
+          <div class="chips" id="momentChips"></div>
+          <input type="text" id="momentEtc" placeholder="그 순간을 조금 더 자세히 써도 좋아요 (선택)">
+        </div>
+      </fieldset>
+
+      <fieldset id="s4">
+        <legend><span class="num">4</span>피클과 함께한 여정 <span class="how">고르고 한 줄 편지</span></legend>
+        <div class="field">
+          <span class="label">피클을 어떻게 썼나요? <span class="multi-tip">여러 개 골라도 돼요</span></span>
+          <div class="chips" id="pkUseChips"></div>
+        </div>
+        <div class="field">
+          <span class="label">인터뷰 전까지 피클로 연습한 횟수</span>
+          <div class="chips" id="pkFreqChips"></div>
+        </div>
+        <div class="field">
+          <span class="label">피클은 얼마나 도움이 되었나요?</span>
+          <div id="pkBox"></div>
+        </div>
+        <div class="field">
+          <span class="label">피클에서 가장 도움이 된 점</span>
+          <div class="chips big" id="pkBestChips"></div>
+        </div>
+        <div class="field">
+          <span class="label">만약 피클 없이 인터뷰를 준비했다면?</span>
+          <div class="chips big" id="pkWithoutChips"></div>
+        </div>
+        <div class="field">
+          <label for="pkLetter">피클에게 보내는 한 줄 편지 💌 <span class="opt">고마웠던 점, 서운했던 점 모두 좋아요</span></label>
+          <textarea id="pkLetter" rows="2" placeholder="예: 피클아, 네가 발음을 계속 고쳐 줘서 인터뷰 때 선생님이 내 말을 한 번에 알아들으셨어!"></textarea>
+        </div>
+        <div class="field">
+          <label for="pkWish">피클이 이렇게 바뀌면 좋겠어요 <span class="opt">(선택)</span></label>
+          <input type="text" id="pkWish" placeholder="예: 친구와 같이 연습하는 기능이 있으면 좋겠어요">
+        </div>
+      </fieldset>
+
+      <fieldset id="s5">
+        <legend><span class="num">5</span>앵거스 프로젝트 돌아보기 <span class="how">별점과 고르기</span></legend>
+        <div class="field">
+          <span class="label">각 활동은 나에게 얼마나 의미 있었나요? ⭐</span>
+          <div id="stageBox"></div>
+        </div>
+        <div class="field">
+          <span class="label">가장 기억에 남는 활동</span>
+          <div class="chips" id="favChips"></div>
+        </div>
+        <div class="field">
+          <span class="label">처음에 나는</span>
+          <div class="chips big" id="atFirstChips"></div>
+        </div>
+        <div class="field">
+          <span class="label">이 프로젝트로 배운 점</span>
+          <div class="chips big" id="learnedChips"></div>
+        </div>
+        <div class="field">
+          <span class="label">앞으로의 다짐</span>
+          <div class="chips big" id="willChips"></div>
+        </div>
+        <div class="field">
+          <span class="label">나는 우리 마을의 앵거스가 될 준비가 되었다</span>
+          <div id="angusBox"></div>
+        </div>
+        <div class="field">
+          <label for="tip">내년에 이 프로젝트를 할 후배에게 한마디 <span class="opt">(선택)</span></label>
+          <input type="text" id="tip" placeholder="예: 질문 6개를 미리 다 말해 보면 인터뷰 하나도 안 무서워!">
+        </div>
+      </fieldset>
+
+      <fieldset id="s6">
+        <legend><span class="num">6</span>선생님께 제출하기</legend>
+        <p class="note" id="submitCheck"></p>
+        <div class="actions">
+          <button class="btn big" type="button" id="submitBtn">제출하기</button>
+          <span class="status" id="submitStatus" role="status"></span>
+        </div>
+      </fieldset>
+    </form>
+
+    <aside class="preview" aria-label="결과물 미리보기">
+      <div class="progress"><span id="progText">배지 0 / 4</span><div class="bar"><i id="progBar"></i></div></div>
+      <div class="tabs" role="tablist">
+        <button type="button" role="tab" id="tab-tag" aria-selected="true" aria-controls="panel-tag">직업 태그</button>
+        <button type="button" role="tab" id="tab-report" aria-selected="false" aria-controls="panel-report">성장 리포트</button>
+        <button type="button" role="tab" id="tab-record" aria-selected="false" aria-controls="panel-record">나의 기록</button>
+      </div>
+
+      <section class="panel" id="panel-tag" role="tabpanel" aria-labelledby="tab-tag">
+        <div class="tag-stage"><div class="tag" id="tagOut"></div></div>
+        <p class="tip">배지 4개를 모으면 태그가 완성돼요. 화면을 캡처해서 간직하세요.</p>
+      </section>
+
+      <section class="panel" id="panel-report" role="tabpanel" aria-labelledby="tab-report" hidden>
+        <div class="en" id="reportOut"></div>
+        <div class="actions">
+          <button class="btn" type="button" id="copyReport">리포트 복사</button>
+          <span class="status" id="reportCount"></span>
+          <span class="status" id="copyReportStatus" role="status"></span>
+        </div>
+      </section>
+
+      <section class="panel" id="panel-record" role="tabpanel" aria-labelledby="tab-record" hidden>
+        <div id="recordOut"></div>
+      </section>
+    </aside>
+  </div>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const HANGUL = /[ㄱ-ㆎ가-힣]/;
+const STORE_KEY = "angus-wrapup-v1";
+const CLASSES = 14, NUMBERS = 33;
+
+const JOBS = [
+  ["수의사", "vet", "Our Town Animal Hospital", "taking care of sick animals", "walk and feed the dogs at the town animal shelter"],
+  ["교사", "teacher", "Our Town Middle School", "teaching students and listening to their worries", "teach English to children at the community center"],
+  ["간호사", "nurse", "Our Town Hospital", "caring for patients", "visit elderly people and check their health"],
+  ["의사", "doctor", "Our Town Medical Center", "treating sick people", "give free health checks at the town hall"],
+  ["경찰관", "police officer", "Our Town Police Station", "keeping our town safe", "help children cross the street safely"],
+  ["소방관", "firefighter", "Our Town Fire Station", "putting out fires and rescuing people", "teach fire safety to children"],
+  ["요리사", "chef", "Our Town Kitchen", "cooking healthy and delicious food", "cook free meals for elderly people"],
+  ["제빵사", "baker", "Our Town Bakery", "baking fresh bread every morning", "share bread with people in need"],
+  ["프로그래머", "programmer", "Our Town Tech Lab", "making apps that solve problems", "teach elderly people how to use smartphones"],
+  ["게임 개발자", "game developer", "Our Town Game Studio", "making fun and educational games", "make a game that teaches children about recycling"],
+  ["웹디자이너", "web designer", "Our Town Design Studio", "designing easy and beautiful websites", "make websites for small shops in our town"],
+  ["유튜버(크리에이터)", "content creator", "Our Town Media Center", "making videos with useful information", "make videos about our town's small shops"],
+  ["사회복지사", "social worker", "Our Town Welfare Center", "supporting people who need help", "visit elderly people who live alone"],
+  ["상담사", "counselor", "Our Town Counseling Center", "listening to people's worries", "run a talking program for teenagers"],
+  ["약사", "pharmacist", "Our Town Pharmacy", "giving the right medicine to sick people", "teach elderly people how to take medicine safely"],
+  ["건축가", "architect", "Our Town Design Office", "designing safe and beautiful buildings", "paint murals on old walls in our town"],
+  ["운동선수", "athlete", "Our Town Sports Center", "giving people hope through sports", "teach sports to children in our town"],
+  ["음악가", "musician", "Our Town Concert Hall", "making music that comforts people", "hold a small concert at a nursing home"],
+  ["과학자", "scientist", "Our Town Science Lab", "solving environmental problems", "organize a clean-up day at the town river"],
+  ["환경 운동가", "environmental activist", "Our Town Green Center", "protecting nature", "pick up trash in the park with my neighbors"],
+  ["사서", "librarian", "Our Town Library", "helping people find good books", "read picture books to young children"],
+  ["승무원", "flight attendant", "Our Town Airport", "keeping passengers safe and comfortable", "guide foreign visitors around our town"],
+  ["번역가", "translator", "Our Town Global Center", "helping people understand other languages", "help foreign families in our town"],
+  ["패션 디자이너", "fashion designer", "Our Town Fashion Studio", "designing clothes that make people confident", "make new clothes from old clothes and give them away"],
+  ["직접 입력", "", "", "", ""]
+].map(([ko, en, place, help, vol]) => ({ ko, en, place, help, vol }));
+const CUSTOM = JOBS.length - 1;
+
+const ROUNDS = [
+  ["Can you tell me why you chose your job?", "I wonder where you will do your volunteer work.", "I want to know what you will do for our town."],
+  ["What makes you excited about your job?", "How will you make our town better?", "What will make people happy after your volunteer work?"]
+];
+
+// [value(English or key), main label, small label]
+const METAPHORS = [
+  ["a turtle hiding in its shell", "🐢", "껍데기 속 거북이"],
+  ["an egg that hasn't hatched yet", "🥚", "아직 안 깬 알"],
+  ["a frozen ice cube", "🧊", "꽁꽁 언 얼음"],
+  ["a little sprout", "🌱", "막 나온 새싹"],
+  ["a sparrow spreading its wings", "🐦", "날개 편 참새"],
+  ["a roaring lion", "🦁", "으르렁 사자"],
+  ["a rocket taking off", "🚀", "날아오르는 로켓"]
+];
+const CH = {
+  iDone: { items: [["I said everything I prepared.", "준비한 대로 다 말했어요"], ["I said most of my answers.", "대부분 말했어요"], ["I said about half of my answers.", "절반쯤 말했어요"], ["I got stuck many times, but I tried.", "많이 막혔지만 해냈어요"]], big: true },
+  iFeel: { items: [["nervous, but I kept going", "떨렸지만 끝까지 말했어요"], ["calm", "차분했어요"], ["proud", "뿌듯했어요"], ["excited", "신났어요"], ["so nervous that my mind went blank", "머리가 하얘졌어요"]] },
+  iHard: { multi: true, items: [["질문 알아듣기"], ["바로 대답 떠올리기"], ["간접의문문, 5형식 문장 만들기"], ["발음"], ["긴장"], ["어려운 점 없었어요"]] },
+  metaB: { emoji: true, own: { frame: "나만의 비유", ph: "예: 말 못 하는 앵무새" }, items: METAPHORS },
+  metaN: { emoji: true, own: { frame: "나만의 비유", ph: "예: 노래하는 앵무새" }, items: METAPHORS },
+  moment: { multi: true, items: [["피클로 여러 번 연습했을 때"], ["답변 틀로 내 문장을 만들었을 때"], ["친구와 서로 질문해 봤을 때"], ["선생님 피드백을 받았을 때"], ["실제 인터뷰를 끝냈을 때"], ["아직 자신감이 잘 안 생겼어요"]] },
+  pkUse: { multi: true, items: [["형성평가로 내 실력 확인"], ["인터뷰 질문 말하기 연습"], ["발음 확인"], ["문장 고치기"], ["집에서 혼자 연습"]] },
+  pkFreq: { items: [["거의 안 했어요"], ["1~2번"], ["3~5번"], ["6번 이상"]] },
+  pkBest: { big: true, items: [["I could practice again and again.", "반복해서 연습할 수 있었어요"], ["It checked my pronunciation.", "발음을 확인해 줬어요"], ["It helped me fix my sentences.", "문장을 고쳐 줬어요"], ["I could practice the interview questions.", "예상 질문을 연습했어요"], ["I could practice alone without stress.", "혼자 편하게 연습했어요"]] },
+  pkWithout: { big: true, items: [["Without Pickle, I would have been much more nervous.", "훨씬 더 떨렸을 거예요"], ["Without Pickle, I would have been a little more nervous.", "조금 더 떨렸을 거예요"], ["Without Pickle, it would have been about the same.", "비슷했을 거예요"], ["Without Pickle, it would have been easier for me.", "오히려 편했을 거예요"]] },
+  fav: { items: [["앵거스 그림책 읽기"], ["봉사활동 계획서 쓰기"], ["피클로 말하기 연습"], ["선생님과 1:1 인터뷰"]] },
+  atFirst: { big: true, own: { frame: "At first, I ______.", ph: "wanted to be a singer" }, items: [["didn't know my dream", "꿈을 몰랐어요"], ["wasn't interested in jobs", "직업에 관심이 없었어요"], ["had a dream but no plan", "꿈은 있었지만 계획이 없었어요"], ["was afraid of speaking English", "영어로 말하기가 두려웠어요"]] },
+  learned: { big: true, own: { frame: "Through this project, I learned that ______.", ph: "I am good at helping people" }, items: [["my job can help our town", "내 직업이 마을에 도움이 될 수 있다"], ["I need a plan for my dream", "꿈에는 계획이 필요하다"], ["I can speak English in front of people", "사람들 앞에서 영어로 말할 수 있다"], ["practice makes me brave", "연습하면 용기가 생긴다"]] },
+  will: { big: true, own: { frame: "From now on, I will ______.", ph: "read a book about my job every month" }, items: [["study harder for my dream", "꿈을 위해 더 열심히 공부할게요"], ["try volunteer work in our town", "마을 봉사활동을 해 볼게요"], ["learn more about my job", "내 직업을 더 알아볼게요"], ["speak English more bravely", "영어로 더 용감하게 말할게요"]] }
+};
+const MULTI = Object.keys(CH).filter(k => CH[k].multi);
+const SINGLE = Object.keys(CH).filter(k => !CH[k].multi);
+
+const CONF = ["나는 영어로 내 생각을 말할 수 있다.", "영어 질문을 받으면 영어로 대답할 수 있다.", "실수해도 끝까지 영어로 말할 수 있다."];
+const ANX = ["영어로 말할 때 긴장되고 가슴이 두근거린다.", "틀릴까 봐 영어로 말하기가 걱정된다.", "다른 사람 앞에서 영어로 말하는 것이 부담스럽다."];
+const PK = ["피클로 연습하면서 말할 내용을 미리 준비할 수 있었다.", "피클의 피드백이 발음과 문장을 고치는 데 도움이 되었다.", "사람 앞이 아니라 피클과 먼저 연습해서 부담이 줄었다.", "피클 덕분에 인터뷰에서 더 자신 있게 말할 수 있었다."];
+const STAGES = ["앵거스 그림책 읽기", "봉사활동 계획서 쓰기", "피클로 말하기 연습", "선생님과 1:1 인터뷰"];
+
+const LIKERT = [...CONF.flatMap((_, i) => ["c" + i + "b", "c" + i + "n"]), ...ANX.flatMap((_, i) => ["a" + i + "b", "a" + i + "n"])];
+const SCALES = [...LIKERT, ...PK.map((_, i) => "pk" + i), ...STAGES.map((_, i) => "st" + i), "angus"];
+const TEXT = ["classNo", "num", "name", "jobSel", "jobEn", "place", "vol", "q1", "q2", "bestLine", "metaWhy", "momentEtc", "pkLetter", "pkWish", "tip", "metaBOwn", "metaNOwn", "atFirstOwn", "learnedOwn", "willOwn"];
+
+/* ---------- build controls ---------- */
+const opts = (n, unit) => `<option value="">고르세요</option>` + Array.from({ length: n }, (_, i) => `<option value="${i + 1}">${i + 1}${unit}</option>`).join("");
+$("classNo").innerHTML = opts(CLASSES, "반");
+$("num").innerHTML = opts(NUMBERS, "번");
+$("jobSel").innerHTML = `<option value="">직업을 고르세요</option>` + JOBS.map((j, i) => `<option value="${i}">${esc(j.ko)}${j.en ? " (" + esc(j.en) + ")" : ""}</option>`).join("");
+[1, 2].forEach(n => { $("q" + n).innerHTML = `<option value="">받은 질문을 고르세요</option>` + ROUNDS[n - 1].map((q, i) => `<option value="${i}">${n}-${i + 1}. ${esc(q)}</option>`).join(""); });
+
+function buildChips(key) {
+  const c = CH[key], type = c.multi ? "checkbox" : "radio";
+  const box = $(key + "Chips");
+  if (c.big) box.classList.add("big");
+  let html = c.items.map((it, i) => {
+    const [val, main, sub] = it;
+    let inner;
+    if (c.emoji) inner = `<b>${main}</b><small>${esc(sub)}</small>`;
+    else if (main) inner = `<span class="en">${esc(val)}</span><small>${esc(main)}</small>`;
+    else inner = esc(val);
+    // Korean-only chips read better in the body font
+    return `<input type="${type}" name="${key}" id="${key}-${i}" value="${esc(val)}"><label for="${key}-${i}">${inner}</label>`;
+  }).join("");
+  if (c.own) html += `<input type="radio" name="${key}" id="${key}-own" value="__own"><label for="${key}-own">${c.emoji ? "<b>✏️</b><small>직접 쓰기</small>" : "직접 쓰기<small>내 말로 쓸래요</small>"}</label>`;
+  box.innerHTML = html;
+  if (c.own) box.insertAdjacentHTML("afterend",
+    `<div class="own" id="${key}OwnBox" hidden><label class="frame" for="${key}Own">${esc(c.own.frame)}</label><input type="text" id="${key}Own" placeholder="${esc(c.own.ph)}">${c.emoji ? "" : `<div class="tr" id="${key}OwnTr"></div>`}</div>`);
+}
+Object.keys(CH).forEach(buildChips);
+
+const scale = (name, star) => `<div class="scale${star ? " star" : ""}">${[1, 2, 3, 4, 5].map(n =>
+  `<input type="radio" name="${name}" id="${name}-${n}" value="${n}"><label for="${name}-${n}" aria-label="${n}점">${star ? "★" : n}</label>`).join("")}</div>`;
+const twoRows = (text, key) => `<div class="lk"><p>${esc(text)}</p><div class="lk-row"><span>처음</span>${scale(key + "b")}</div><div class="lk-row"><span>지금</span>${scale(key + "n")}</div></div>`;
+$("likertBox").innerHTML = CONF.map((t, i) => twoRows(t, "c" + i)).join("") + ANX.map((t, i) => twoRows(t, "a" + i)).join("");
+$("pkBox").innerHTML = PK.map((t, i) => `<div class="lk"><p>${i + 1}. ${esc(t)}</p><div class="lk-row">${scale("pk" + i)}</div></div>`).join("");
+$("stageBox").innerHTML = STAGES.map((t, i) => `<div class="lk"><p>${esc(t)}</p><div class="lk-row">${scale("st" + i, true)}</div></div>`).join("");
+$("angusBox").innerHTML = `<div class="lk-row">${scale("angus")}</div>`;
+
+/* ---------- reading state ---------- */
+const radio = name => { const c = document.querySelector(`input[name="${name}"]:checked`); return c ? c.value : ""; };
+const checks = name => [...document.querySelectorAll(`input[name="${name}"]:checked`)].map(i => i.value);
+const val = id => $(id).value.trim();
+const clean = s => (s || "").trim().replace(/\s+/g, " ").replace(/[.!?。]+$/, "");
+const sentence = s => { s = (s || "").trim(); if (!s) return ""; s = s[0].toUpperCase() + s.slice(1); return /[.!?"]$/.test(s) ? s : s + "."; };
+const titleCase = s => s.replace(/\b([a-z])/g, m => m.toUpperCase());
+const art = w => (/^[aeiou]/i.test(w) ? "an " : "a ") + w;
+const miss = label => `<mark class="miss">${label}</mark>`;
+const v = (s, label) => s ? esc(s) : miss(label);
+const avg = a => a.length ? a.reduce((x, y) => x + y, 0) / a.length : null;
+
+function own(key) {   // chosen value, with "write my own" resolved
+  const r = radio(key);
+  if (r !== "__own") return r;
+  return clean(val(key + "Own").replace(/^(At first,?|Through this project,?|I learned( that)?|From now on,?|I will|I)\s+/i, ""));
+}
+function metaInfo(key) {
+  const r = radio(key);
+  if (!r) return null;
+  if (r === "__own") { const t = val(key + "Own"); return t ? { en: t, emoji: "✏️", ko: t } : null; }
+  const m = METAPHORS.find(x => x[0] === r);
+  return m ? { en: m[0], emoji: m[1], ko: m[2] } : null;
+}
+function index(items, prefix, sfx) {   // average of 1–5 items mapped onto 0–100
+  const xs = items.map((_, i) => +radio(prefix + i + sfx)).filter(Boolean);
+  if (xs.length < items.length) return null;
+  return Math.round((avg(xs) - 1) / 4 * 100);
+}
+function job() {
+  const sel = $("jobSel").value;
+  const j = sel === "" ? null : JOBS[+sel];
+  return { en: clean(val("jobEn")), ko: j && j.en ? j.ko : "", place: val("place"), help: j ? j.help : "" };
+}
+
+const SECTIONS = {
+  s1: () => val("classNo") && val("num") && val("name") && job().en,
+  s2: () => val("q1") && val("q2") && radio("iDone") && radio("iFeel"),
+  s3: () => metaInfo("metaB") && metaInfo("metaN") && val("metaWhy").length >= 8 && LIKERT.every(radio),
+  s4: () => radio("pkFreq") && PK.every((_, i) => radio("pk" + i)) && radio("pkBest") && radio("pkWithout") && val("pkLetter").length >= 5,
+  s5: () => STAGES.every((_, i) => radio("st" + i)) && radio("fav") && own("atFirst") && own("learned") && own("will") && radio("angus")
+};
+const NEEDS = {
+  s2: "인터뷰 질문 두 개, 인터뷰에서 나는, 기분",
+  s3: "비유 두 개, 바뀐 이유 2문장, 처음과 지금 점수 12개",
+  s4: "연습 횟수, 도움 점수 4개, 가장 도움 된 점, 피클 없이라면, 한 줄 편지",
+  s5: "별점 4개, 기억에 남는 활동, 처음에 나는, 배운 점, 다짐, 앵거스 준비 점수"
+};
+
+/* ---------- Korean in English fields: point to a translator ---------- */
+function trHint(id) {
+  const box = $(id + "Tr");
+  if (!box) return;
+  const s = val(id);
+  if (!HANGUL.test(s)) { box.innerHTML = ""; return; }
+  const q = encodeURIComponent(s);
+  box.innerHTML = `한글이 있어요. 영어로 바꿔서 다시 써 주세요:
+    <a href="https://papago.naver.com/?sk=ko&tk=en&st=${q}" target="_blank" rel="noopener">파파고 ↗</a>
+    <a href="https://translate.google.com/?sl=ko&tl=en&text=${q}&op=translate" target="_blank" rel="noopener">구글 번역 ↗</a>`;
+}
+
+/* ---------- renders ---------- */
+function renderTag() {
+  const j = job(), name = val("name");
+  const done = Object.fromEntries(Object.keys(SECTIONS).map(k => [k, !!SECTIONS[k]()]));
+  const mb = metaInfo("metaB"), mn = metaInfo("metaN");
+  const cb = index(CONF, "c", "b"), cn = index(CONF, "c", "n");
+  const g = (lbl, x, cls) => `<div class="g ${cls}"><span>${lbl}</span><div class="t"><i style="width:${x ?? 0}%"></i></div><span>${x ?? "-"}</span></div>`;
+  const B = (on, icon, text) => `<div class="bdg${on ? " on" : ""}"><div><b>${icon}</b>${text}</div></div>`;
+  $("tagOut").innerHTML = `
+    <div class="tag-top">BE THE ANGUS OF OUR TOWN</div>
+    ${done.s2 ? `<div class="tag-stamp">INTERVIEW<br>COMPLETE</div>` : ""}
+    <div class="tag-mono">${esc(name ? name[0].toUpperCase() : "?")}</div>
+    <div class="tag-name">${v(name, "이름")}</div>
+    <div class="tag-job">${j.en ? esc(titleCase(j.en)) : miss("직업")}</div>
+    ${j.ko ? `<div class="tag-ko">${esc(j.ko)}</div>` : ""}
+    <div class="tag-place">${v(j.place, "일하는 곳")}</div>
+    <div class="journey">
+      <div>${mb ? esc(mb.emoji) : "❔"}<small>THEN</small></div><span class="arrow">➜</span><div>${mn ? esc(mn.emoji) : "❔"}<small>NOW</small></div>
+    </div>
+    <div class="gauge">SPEAKING CONFIDENCE${g("THEN", cb, "")}${g("NOW", cn, "now")}</div>
+    <dl><div><dt>My promise to Our Town</dt><dd>I will ${v(clean(val("vol")), "약속")}.</dd></div></dl>
+    <div class="badges">
+      ${B(done.s2, "🎤", "INTERVIEW<br>CLEAR")}${B(done.s3, "🦁", "BRAVE<br>SPEAKER")}${B(done.s4, "🥒", "PICKLE<br>PARTNER")}${B(done.s5, "🐦", "ANGUS OF<br>OUR TOWN")}
+    </div>`;
+  const n = ["s2", "s3", "s4", "s5"].filter(k => done[k]).length;
+  $("progText").textContent = `배지 ${n} / 4`;
+  $("progBar").style.width = n * 25 + "%";
+  Object.keys(SECTIONS).forEach(k => $(k).classList.toggle("done", done[k]));
+  return done;
+}
+
+function renderReport() {
+  const j = job(), name = val("name");
+  const q1 = val("q1") === "" ? "" : ROUNDS[0][+val("q1")], q2 = val("q2") === "" ? "" : ROUNDS[1][+val("q2")];
+  const mb = metaInfo("metaB"), mn = metaInfo("metaN");
+  const best = val("bestLine");
+  const ko = s => s && HANGUL.test(s) ? ` <span class="ko">(한글은 영어로 바꿔 주세요)</span>` : "";
+  $("reportOut").innerHTML = `
+    <h2>My Growth Report: Future ${j.en ? esc(titleCase(j.en)) : miss("직업")}</h2>
+    <p>Hello, my name is ${v(name, "이름")}. In 2036, I am ${j.en ? esc(art(j.en)) : miss("직업")} at ${v(j.place, "일하는 곳")}. To make Our Town better, I will ${v(clean(val("vol")), "약속")}.${ko(val("vol"))}</p>
+    <p>I finished my interviews with my teacher! The first question was "${v(q1, "1차 질문")}" and the second question was "${v(q2, "2차 질문")}" ${v(radio("iDone"), "인터뷰에서 나는")} During the interview, I felt ${v(radio("iFeel"), "기분")}.${best ? ` My proudest sentence was "${esc(sentence(best))}"${ko(best)}` : ""}</p>
+    <p>When this project started, speaking English made me feel like ${mb ? esc(mb.en) : miss("처음의 나")}. Now I feel like ${mn ? esc(mn.en) : miss("지금의 나")}. ${v(radio("pkBest") && "Pickle helped me a lot. " + radio("pkBest"), "피클에서 도움 된 점")} ${v(radio("pkWithout"), "피클 없이라면")}</p>
+    <p>At first, I ${v(own("atFirst"), "처음의 나")}${ko(own("atFirst"))}. Through this project, I learned that ${v(own("learned"), "배운 점")}${ko(own("learned"))}. From now on, I will ${v(own("will"), "다짐")}${ko(own("will"))}. I am ready to be the Angus of Our Town!</p>`;
+  const words = $("reportOut").innerText.trim().split(/\s+/).filter(Boolean).length;
+  $("reportCount").textContent = `약 ${words} words`;
+}
+
+function renderRecord() {
+  const cb = index(CONF, "c", "b"), cn = index(CONF, "c", "n");
+  const ab = index(ANX, "a", "b"), an = index(ANX, "a", "n");
+  const row = (lbl, x, cls) => `<div class="srow"><span>${lbl}</span><div class="meter ${cls}"><i style="width:${x ?? 0}%"></i></div><span>${x === null ? "-" : x + "점"}</span></div>`;
+  const diff = (b, n, up) => b === null || n === null ? "" : n === b ? "처음과 비슷해요." : `처음보다 ${Math.abs(n - b)}점 ${n > b ? "올라갔어요" : "내려갔어요"}${(n > b) === up ? " 👏" : "."}`;
+  const pks = PK.map((_, i) => +radio("pk" + i)).filter(Boolean);
+  const stars = STAGES.map((t, i) => `${esc(t)} ${"★".repeat(+radio("st" + i) || 0) || "-"}`).join("<br>");
+  const mb = metaInfo("metaB"), mn = metaInfo("metaN");
+  $("recordOut").innerHTML = `
+    <h3>말하기 자신감 지수 <span class="ko">0~100</span></h3>
+    ${row("처음", cb, "")}${row("지금", cn, "now")}
+    <p class="delta">${diff(cb, cn, true)}</p>
+    <h3>말하기 불안 지수 <span class="ko">0 편안 ~ 100 매우 불안</span></h3>
+    ${row("처음", ab, "")}${row("지금", an, "now")}
+    <p class="delta">${diff(ab, an, false)}</p>
+    <h3>나의 변화</h3>
+    <p>${mb ? esc(mb.emoji + " " + mb.ko) : "-"} ➜ ${mn ? esc(mn.emoji + " " + mn.ko) : "-"}</p>
+    ${val("metaWhy") ? `<p>${esc(val("metaWhy"))}</p>` : ""}
+    <h3>피클 도움 정도 <span class="ko">평균 ${pks.length ? avg(pks).toFixed(1) : "-"} / 5</span></h3>
+    ${val("pkLetter") ? `<p>💌 ${esc(val("pkLetter"))}</p>` : ""}
+    <h3>활동 별점</h3>
+    <p>${stars}</p>`;
+}
+
+function renderSubmitCheck(done) {
+  const idOk = val("classNo") && val("num") && val("name");
+  const left = ["s2", "s3", "s4", "s5"].filter(k => !done[k]);
+  $("submitCheck").innerHTML = !idOk ? "1번에서 반, 번호, 이름을 먼저 써 주세요."
+    : !done.s1 ? "1번에서 직업을 골라 주세요."
+    : left.length ? "아직 비어 있는 곳이 있어요.<br>" + left.map(k => `${k.slice(1)}번: ${NEEDS[k]}`).join("<br>") + "<br>다 채우지 않아도 제출은 할 수 있어요."
+    : "배지 4개를 모두 모았어요! 제출하기를 눌러 주세요. 🎉";
+  $("submitBtn").disabled = !idOk;
+}
+
+function update() {
+  $("customRow").hidden = $("jobSel").value !== String(CUSTOM);
+  for (const k of Object.keys(CH)) if (CH[k].own) $(k + "OwnBox").hidden = radio(k) !== "__own";
+  ["vol", "bestLine", "atFirstOwn", "learnedOwn", "willOwn"].forEach(trHint);
+  const done = renderTag();
+  renderReport(); renderRecord(); renderSubmitCheck(done);
+  try { localStorage.setItem(STORE_KEY, JSON.stringify(read())); } catch (e) {}
+}
+
+function read() {
+  const d = {};
+  TEXT.forEach(k => d[k] = $(k).value);
+  [...SINGLE, ...SCALES].forEach(k => d[k] = radio(k));
+  MULTI.forEach(k => d[k] = checks(k));
+  return d;
+}
+function fill(d) {
+  TEXT.forEach(k => $(k).value = d[k] ?? "");
+  [...SINGLE, ...SCALES].forEach(k => document.querySelectorAll(`input[name="${k}"]`).forEach(i => i.checked = i.value === d[k]));
+  MULTI.forEach(k => document.querySelectorAll(`input[name="${k}"]`).forEach(i => i.checked = (d[k] || []).includes(i.value)));
+  update();
+}
+
+/* ---------- events ---------- */
+$("jobSel").addEventListener("change", () => {
+  const s = $("jobSel").value, j = s === "" ? JOBS[CUSTOM] : JOBS[+s];
+  $("jobEn").value = j.en; $("place").value = j.place; $("vol").value = j.vol;
+  update();
+});
+$("f").addEventListener("input", update);
+$("f").addEventListener("change", e => { update(); if (e.target.value === "__own") $(e.target.name + "Own").focus(); });
+$("f").addEventListener("submit", e => e.preventDefault());
+
+const TABS = ["tag", "report", "record"];
+TABS.forEach(t => $("tab-" + t).addEventListener("click", () => TABS.forEach(o => {
+  $("tab-" + o).setAttribute("aria-selected", String(o === t));
+  $("panel-" + o).hidden = o !== t;
+})));
+
+$("copyReport").addEventListener("click", () => {
+  const el = $("reportOut"), st = $("copyReportStatus");
+  const done = m => { st.textContent = m; setTimeout(() => st.textContent = "", 2500); };
+  const fallback = () => { const r = document.createRange(); r.selectNodeContents(el); const s = getSelection(); s.removeAllRanges(); s.addRange(r); done("선택됐어요. Ctrl+C로 복사하세요."); };
+  if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(el.innerText.trim()).then(() => done("복사했어요."), fallback);
+  else fallback();
+});
+
+let armed = null;
+$("resetBtn").addEventListener("click", () => {
+  if (!armed) {
+    $("resetBtn").textContent = "한 번 더 누르면 모두 지워져요";
+    armed = setTimeout(() => { armed = null; $("resetBtn").textContent = "처음부터 다시"; }, 3000);
+    return;
+  }
+  clearTimeout(armed); armed = null;
+  fill({});
+  $("resetBtn").textContent = "처음부터 다시";
+});
+
+/* ---------- submit ---------- */
+function buildPayload() {
+  const j = job(), mb = metaInfo("metaB"), mn = metaInfo("metaN");
+  const cb = index(CONF, "c", "b"), cn = index(CONF, "c", "n"), ab = index(ANX, "a", "b"), an = index(ANX, "a", "n");
+  const pks = PK.map((_, i) => +radio("pk" + i)).filter(Boolean);
+  const p = {
+    id: `${val("classNo")}-${val("num")}`, classNo: +val("classNo"), num: +val("num"), name: val("name"),
+    job: j.en, jobKo: j.ko, promise: clean(val("vol")),
+    q1: val("q1") === "" ? "" : ROUNDS[0][+val("q1")], q2: val("q2") === "" ? "" : ROUNDS[1][+val("q2")],
+    interviewDone: (CH.iDone.items.find(x => x[0] === radio("iDone")) || [])[1] || "",
+    interviewFeel: (CH.iFeel.items.find(x => x[0] === radio("iFeel")) || [])[1] || "",
+    interviewHard: checks("iHard").join(" / "), bestLine: val("bestLine"),
+    confBefore: cb, confNow: cn, confGain: cb !== null && cn !== null ? cn - cb : null,
+    anxBefore: ab, anxNow: an, anxDrop: ab !== null && an !== null ? ab - an : null,
+    metaBefore: mb ? mb.ko : "", metaNow: mn ? mn.ko : "", metaWhy: val("metaWhy"),
+    moment: checks("moment").join(" / "), momentEtc: val("momentEtc"),
+    pkUse: checks("pkUse").join(" / "), pkFreq: radio("pkFreq"),
+    pkAvg: pks.length ? Math.round(avg(pks) * 10) / 10 : null,
+    pkBest: (CH.pkBest.items.find(x => x[0] === radio("pkBest")) || [])[1] || "",
+    pkWithout: (CH.pkWithout.items.find(x => x[0] === radio("pkWithout")) || [])[1] || "",
+    pkLetter: val("pkLetter"), pkWish: val("pkWish"),
+    favActivity: radio("fav"), angusReady: +radio("angus") || null,
+    atFirst: own("atFirst"), learned: own("learned"), will: own("will"), tipForJuniors: val("tip"),
+    report: $("reportOut").innerText.trim()
+  };
+  SCALES.forEach(k => p[k] = +radio(k) || null);   // raw item scores for paired before/after analysis
+  return p;
+}
+
+$("submitBtn").addEventListener("click", async () => {
+  const st = $("submitStatus");
+  if (!window.submitToTeacher) { st.textContent = "제출 기능을 불러오는 중이에요. 잠시 뒤 다시 눌러 주세요."; return; }
+  $("submitBtn").disabled = true;
+  st.textContent = "제출하는 중…";
+  try {
+    await window.submitToTeacher(buildPayload());
+    st.textContent = "제출했어요! 수고 많았어요. 고친 뒤 다시 제출하면 마지막 것이 반영돼요. 🎉";
+  } catch (e) {
+    st.textContent = e && e.message === "not-configured" ? "선생님이 아직 제출 기능을 연결하지 않았어요." : "제출하지 못했어요. 인터넷 연결을 확인하고 다시 눌러 주세요.";
+  } finally {
+    $("submitBtn").disabled = !(val("classNo") && val("num") && val("name"));
+  }
+});
+
+/* ---------- start ---------- */
+let saved = null;
+try { saved = JSON.parse(localStorage.getItem(STORE_KEY) || "null"); } catch (e) {}
+fill(saved || {});
+if (saved && saved.name) $("noticeText").innerHTML = "<strong>이어 쓰기</strong>: 지난번에 쓴 내용을 불러왔어요.";
+</script>
+
+<script type="module">
+/* ===== 제출 연결: 둘 중 하나만 채우면 됩니다 =====
+   A) 구글 시트(Apps Script 웹 앱) 주소를 SHEET_URL에 넣기
+   B) Firebase 설정값을 firebaseConfig에 넣기 (Firestore 컬렉션: angus_wrapup, 문서 이름: 반-번호)
+   같은 학생이 다시 제출하면 시트와 Firebase 모두 그 학생의 줄을 새 내용으로 바꿉니다. */
+const SHEET_URL = "";
+const firebaseConfig = {
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+  projectId: "YOUR_PROJECT_ID",
+  storageBucket: "YOUR_PROJECT_ID.appspot.com",
+  messagingSenderId: "YOUR_SENDER_ID",
+  appId: "YOUR_APP_ID"
+};
+/* Apps Script 예시 (시트에 붙여 넣고 웹 앱으로 배포, 액세스: 모든 사용자)
+function doPost(e) {
+  const lock = LockService.getScriptLock();
+  lock.waitLock(20000);
+  try {
+    const d = JSON.parse(e.postData.contents);
+    d.id = d.classNo + "반 " + d.num + "번";
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
+    const sh = ss.getSheetByName("응답") || ss.insertSheet("응답");
+    if (sh.getLastRow() === 0) sh.appendRow(["제출시각", ...Object.keys(d)]);
+    const head = sh.getRange(1, 1, 1, sh.getLastColumn()).getValues()[0];
+    const row = head.map(h => h === "제출시각" ? new Date() : (d[h] ?? ""));
+    const idCol = head.indexOf("id") + 1, last = sh.getLastRow();
+    const ids = last > 1 ? sh.getRange(2, idCol, last - 1, 1).getValues().flat() : [];
+    const i = ids.indexOf(d.id);
+    if (i >= 0) sh.getRange(i + 2, 1, 1, row.length).setValues([row]);
+    else sh.appendRow(row);
+    return ContentService.createTextOutput("ok");
+  } finally {
+    lock.releaseLock();
+  }
+}
+*/
+const fbReady = firebaseConfig.apiKey && !firebaseConfig.apiKey.startsWith("YOUR_");
+const SDK = "https://www.gstatic.com/firebasejs/10.12.2/";
+let dbPromise = null;
+const getDb = () => dbPromise ??= (async () => {
+  const { initializeApp } = await import(SDK + "firebase-app.js");
+  const fs = await import(SDK + "firebase-firestore.js");
+  return { fs, db: fs.getFirestore(initializeApp(firebaseConfig)) };
+})();
+
+window.submitToTeacher = async (payload) => {
+  if (!SHEET_URL && !fbReady) throw new Error("not-configured");
+  if (SHEET_URL) {
+    await fetch(SHEET_URL, { method: "POST", mode: "no-cors", body: JSON.stringify(payload) });
+  }
+  if (fbReady) {
+    const { fs, db } = await getDb();
+    await fs.setDoc(fs.doc(db, "angus_wrapup", payload.id), { ...payload, updatedAt: fs.serverTimestamp() });
+  }
+};
+</script>
+</body>
+</html>
