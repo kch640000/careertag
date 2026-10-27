@@ -153,12 +153,43 @@ mark.miss { background: var(--miss-bg); color: var(--miss-fg); border-radius: 4p
 .tag dt { font-weight: 800; font-size: 10.5px; letter-spacing: .12em; text-transform: uppercase; opacity: .7; }
 .tag dd { margin: 0; overflow-wrap: anywhere; }
 .tag mark.miss { background: rgba(255,255,255,.55); color: var(--badge-ink); }
-.badges { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-top: 14px; }
+.badges { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; margin-top: 14px; }
 .bdg { aspect-ratio: 1; border-radius: 50%; border: 1.5px dashed currentColor; display: grid; place-items: center; text-align: center; font-size: 8.5px; font-weight: 800; letter-spacing: .03em; line-height: 1.1; opacity: .35; padding: 4px; }
 .bdg b { display: block; font-size: 18px; font-weight: 400; }
 .bdg.on { opacity: 1; border-style: solid; background: var(--badge-ink); color: var(--badge); }
 .tip { font-size: 13px; color: var(--muted); text-align: center; margin: 8px 0 0; }
 @media (prefers-reduced-motion: reduce) { .bar i { transition: none; } }
+
+/* PDF (print) sheet */
+.print-only { display: none; }
+@media print {
+  :root, :root[data-theme="dark"], :root:not([data-theme="light"]) {
+    --bg: #ffffff; --surface: #ffffff; --ink: #111111; --muted: #555555; --line: #bbbbbb;
+    --accent: #0f7a6c; --accent-ink: #ffffff; --badge: #f2c230; --badge-ink: #2a2208; --stamp: #c0392b;
+    color-scheme: light;
+  }
+  @page { size: A4; margin: 14mm; }
+  body { padding: 0; background: #fff; font-size: 10.5pt; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  body > .wrap { display: none !important; }
+  .print-only { display: block; }
+  .ps-head { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 2px solid #111; padding-bottom: 6px; margin-bottom: 10px; }
+  .ps-head h1 { font-family: var(--font-display); font-weight: 400; font-size: 18pt; margin: 0; }
+  .ps-head div { font-size: 11pt; font-weight: 700; }
+  .ps-top { display: grid; grid-template-columns: 260px 1fr; gap: 16px; align-items: start; margin-bottom: 10px; }
+  .ps-top .tag { width: 260px; box-shadow: none; padding: 30px 16px 16px; }
+  .ps-top .tag-name { font-size: 20px; }
+  .ps-top .bdg { font-size: 7px; padding: 2px; }
+  .ps-top .bdg b { font-size: 14px; }
+  .ps-report { font-family: var(--font-en); font-size: 10pt; line-height: 1.55; }
+  .ps-report h2 { font-size: 13pt; margin: 0 0 6px; }
+  .ps-report p { margin: 0 0 6px; }
+  .print-only h3 { font-size: 11.5pt; margin: 12px 0 4px; border-left: 4px solid var(--accent); padding-left: 6px; }
+  .print-only table { width: 100%; border-collapse: collapse; font-size: 9.5pt; }
+  .print-only th, .print-only td { border: 1px solid #bbb; padding: 3px 6px; text-align: left; vertical-align: top; }
+  .print-only th { background: #f1f4f3; width: 30%; font-weight: 700; }
+  .print-only td.c, .print-only th.c { text-align: center; width: 12%; }
+  .print-only .sec { break-inside: avoid; }
+}
 </style>
 </head>
 <body>
@@ -324,8 +355,10 @@ mark.miss { background: var(--miss-bg); color: var(--miss-fg); border-radius: 4p
         <p class="note" id="submitCheck"></p>
         <div class="actions">
           <button class="btn big" type="button" id="submitBtn">제출하기</button>
+          <button class="btn big ghost" type="button" id="pdfBtn">PDF로 저장하기</button>
           <span class="status" id="submitStatus" role="status"></span>
         </div>
+        <p class="note">PDF로 저장하기를 누르고 인쇄 화면에서 대상(프린터)을 <b>PDF로 저장</b>으로 고르세요. 저장한 파일은 선생님이 알려 준 곳에 올려요.</p>
       </fieldset>
     </form>
 
@@ -357,6 +390,8 @@ mark.miss { background: var(--miss-bg); color: var(--miss-fg); border-radius: 4p
     </aside>
   </div>
 </div>
+
+<section class="print-only" id="printSheet" aria-hidden="true"></section>
 
 <script>
 const $ = id => document.getElementById(id);
@@ -717,6 +752,49 @@ $("submitBtn").addEventListener("click", async () => {
   }
 });
 
+/* ---------- PDF (print) sheet ---------- */
+function renderPrint() {
+  const p = buildPayload();
+  const kv = (label, value) => `<tr><th>${esc(label)}</th><td>${value === null || value === undefined || value === "" ? "-" : esc(value)}</td></tr>`;
+  const sc = k => +radio(k) || "-";
+  const pair = (t, k) => `<tr><td>${esc(t)}</td><td class="c">${sc(k + "b")}</td><td class="c">${sc(k + "n")}</td></tr>`;
+  const ix = (b, n) => b === null || n === null ? "-" : `${b} → ${n}`;
+  $("printSheet").innerHTML = `
+    <div class="ps-head"><h1>Be the Angus of Our Town 마무리 기록</h1><div>2학년 ${esc(p.classNo || "-")}반 ${esc(p.num || "-")}번 ${esc(p.name || "-")}</div></div>
+    <div class="ps-top">
+      <div class="tag">${$("tagOut").innerHTML}</div>
+      <div class="ps-report">${$("reportOut").innerHTML}</div>
+    </div>
+    <div class="sec"><h3>2. 인터뷰를 마치고</h3><table>
+      ${kv("1차 질문", p.q1)}${kv("2차 질문", p.q2)}${kv("인터뷰에서 나는", p.interviewDone)}${kv("인터뷰할 때 기분", p.interviewFeel)}
+      ${kv("가장 어려웠던 점", p.interviewHard)}${kv("자랑스러운 문장", p.bestLine)}</table></div>
+    <div class="sec"><h3>3. 용기 측정기</h3><table>
+      ${kv("영어로 말하는 나 (처음 → 지금)", (p.metaBefore || "-") + " → " + (p.metaNow || "-"))}${kv("바뀐 이유", p.metaWhy)}
+      ${kv("자신감 지수 (0~100)", ix(p.confBefore, p.confNow))}${kv("불안 지수 (0~100)", ix(p.anxBefore, p.anxNow))}
+      ${kv("자신감이 생긴 결정적 순간", p.moment)}${kv("그 순간 설명", p.momentEtc)}</table>
+      <table style="margin-top:6px"><tr><th style="width:auto">문항 (1 전혀 아니다 ~ 5 매우 그렇다)</th><th class="c">처음</th><th class="c">지금</th></tr>
+      ${CONF.map((t, i) => pair(t, "c" + i)).join("")}${ANX.map((t, i) => pair(t, "a" + i)).join("")}</table></div>
+    <div class="sec"><h3>4. 피클과 함께한 여정</h3><table>
+      ${kv("피클을 쓴 방법", p.pkUse)}${kv("연습 횟수", p.pkFreq)}
+      ${PK.map((t, i) => kv(t, sc("pk" + i))).join("")}
+      ${kv("가장 도움이 된 점", p.pkBest)}${kv("피클 없이 준비했다면", p.pkWithout)}${kv("피클에게 보내는 편지", p.pkLetter)}${kv("바라는 점", p.pkWish)}</table></div>
+    <div class="sec"><h3>5. 프로젝트 돌아보기</h3><table>
+      ${STAGES.map((t, i) => kv(t + " (별점)", "★".repeat(+radio("st" + i) || 0))).join("")}
+      ${kv("가장 기억에 남는 활동", p.favActivity)}${kv("처음에 나는", p.atFirst)}${kv("배운 점", p.learned)}${kv("앞으로의 다짐", p.will)}
+      ${kv("앵거스가 될 준비 (1~5)", p.angusReady)}${kv("후배에게 한마디", p.tipForJuniors)}</table></div>`;
+}
+
+$("pdfBtn").addEventListener("click", () => {
+  if (!(val("classNo") && val("num") && val("name"))) { $("submitStatus").textContent = "1번에서 반, 번호, 이름을 먼저 써 주세요."; return; }
+  renderPrint();
+  const old = document.title;
+  document.title = `${val("classNo")}반${val("num")}번_${val("name")}_CareerTag`;   // default PDF file name
+  const restore = () => { document.title = old; window.removeEventListener("afterprint", restore); };
+  window.addEventListener("afterprint", restore);
+  window.print();
+  setTimeout(restore, 3000);
+});
+
 /* ---------- start ---------- */
 let saved = null;
 try { saved = JSON.parse(localStorage.getItem(STORE_KEY) || "null"); } catch (e) {}
@@ -731,12 +809,12 @@ if (saved && saved.name) $("noticeText").innerHTML = "<strong>이어 쓰기</str
    같은 학생이 다시 제출하면 시트와 Firebase 모두 그 학생의 줄을 새 내용으로 바꿉니다. */
 const SHEET_URL = "";
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_PROJECT_ID.appspot.com",
-  messagingSenderId: "YOUR_SENDER_ID",
-  appId: "YOUR_APP_ID"
+  apiKey: "AIzaSyAxp7UqNhv6_kh5htkGnSDwsXTfLOiI18A",
+  authDomain: "volunteerwork-16d70.firebaseapp.com",
+  projectId: "volunteerwork-16d70",
+  storageBucket: "volunteerwork-16d70.firebasestorage.app",
+  messagingSenderId: "782866471597",
+  appId: "1:782866471597:web:46755b64f6c1fc43ddc424"
 };
 /* Apps Script 예시 (시트에 붙여 넣고 웹 앱으로 배포, 액세스: 모든 사용자)
 function doPost(e) {
